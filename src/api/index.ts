@@ -36,9 +36,9 @@ export const fetchTopHeadlines = async () => {
   return response;
 };
 
-export const fetchNewsWithCategory = async (_: string, category: string,page:number) => {
+export const fetchNewsWithCategory = async (_: string, category: string,page:number,search:string) => {
   const response = await call({
-    url: `${BASE_API.url}/top-headlines?country=us&category=${category}&page=${page}&pageSize=3`,
+    url: `${BASE_API.url}/top-headlines?country=us&q=${search}&category=${category}&page=${page}&pageSize=3`,
     headers: BASE_API.headers,
     method: "GET",
   });

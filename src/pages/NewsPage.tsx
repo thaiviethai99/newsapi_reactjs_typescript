@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import ReactPaginate from 'react-paginate';
-import { Heading, Text, Box, Image, Stack, Flex } from "@chakra-ui/core";
+import { Heading, Text, Box, Image, Stack, Flex ,Input } from "@chakra-ui/core";
 
 import * as API from "../api";
 import { IArticle } from "../constants";
@@ -23,6 +23,7 @@ const NewsPage: React.FC<{}> = () => {
   const [totalResult, setTotalResult] = useState<TotalResult>({ totalResults:0 });
   const [currentPage, setcurrentPage] = useState(1);
   const [pageCount, setPageCount] = useState(1);
+  const [query, setQuery] = useState('');
 
   useEffect(() => {
     const fetchDataTop = async () => {
@@ -44,22 +45,32 @@ const NewsPage: React.FC<{}> = () => {
  
   useEffect(() => {
     const fetchData = async () => {
-      const result = await API.fetchNewsWithCategory('','politics',currentPage);
+      const result = await API.fetchNewsWithCategory('','politics',currentPage,query);
       setPoliticsNewsQuery(result.articles);
       setTotalResult({totalResults:result.totalResults});
-      const pageTotal=Math.round(result.totalResults/3);
-      //console.log('pageTotal',pageTotal);
+      const pageTotal=Math.ceil(result.totalResults/3);
+      console.log('pageTotal',pageTotal);
       setPageCount(pageTotal);
     };
  
     fetchData();
-  }, [currentPage]);
+  }, [currentPage,query]);
 
   const handlePageChange = (selectedObject) => {
     const nextPage = selectedObject.selected+ 1;
     setcurrentPage(nextPage);
 		//handleFetch();
-	};
+  };
+
+  const  handleInputChange = (event) => {
+    // const target = event.target;
+    // const value = target.value;
+    // const name = target.name;
+    setQuery(event.target.value);
+    setcurrentPage(1);
+  };
+  
+  
 
   return (
     <>
@@ -119,6 +130,7 @@ const NewsPage: React.FC<{}> = () => {
           pt={5}
           px={5} 
         >
+          <Input placeholder="Search" onChange={handleInputChange} /> 
           {headlinesQuery.map(
             (article: IArticle, idx: number) => (
               <Box key={idx} mb={5} py={1}>
