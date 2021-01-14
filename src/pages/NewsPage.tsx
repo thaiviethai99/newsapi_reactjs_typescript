@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useQuery } from "react-query";
+import ReactPaginate from 'react-paginate';
 import { Heading, Text, Box, Image, Stack, Flex } from "@chakra-ui/core";
 
 import * as API from "../api";
@@ -7,6 +8,7 @@ import { IArticle } from "../constants";
 import { TotalResult } from "../constants";
 import { Navbar, CategoriesBar, CategoryBox } from "../components";
 import { formatDate } from '../utils';
+import '../utils/home.css';
 
 const NewsPage: React.FC<{}> = () => {
   const [bannerNews, setBannerNews] = useState<IArticle | null>(null);
@@ -19,6 +21,8 @@ const NewsPage: React.FC<{}> = () => {
   const [headlinesQuery, setHeadlinesQuery] = useState<IArticle[]>([]);
   const [politicsNewsQuery, setPoliticsNewsQuery] = useState<IArticle[]>([]);
   const [totalResult, setTotalResult] = useState<TotalResult>({ totalResults:0 });
+  const [currentPage, setcurrentPage] = useState(1);
+  const [pageCount, setPageCount] = useState(1);
 
   useEffect(() => {
     const fetchDataTop = async () => {
@@ -40,13 +44,22 @@ const NewsPage: React.FC<{}> = () => {
  
   useEffect(() => {
     const fetchData = async () => {
-      const result = await API.fetchNewsWithCategory('','politics');
+      const result = await API.fetchNewsWithCategory('','politics',currentPage);
       setPoliticsNewsQuery(result.articles);
       setTotalResult({totalResults:result.totalResults});
+      const pageTotal=Math.round(result.totalResults/3);
+      //console.log('pageTotal',pageTotal);
+      setPageCount(pageTotal);
     };
  
     fetchData();
-  }, []);
+  }, [currentPage]);
+
+  const handlePageChange = (selectedObject) => {
+    const nextPage = selectedObject.selected+ 1;
+    setcurrentPage(nextPage);
+		//handleFetch();
+	};
 
   return (
     <>
@@ -79,7 +92,23 @@ const NewsPage: React.FC<{}> = () => {
             </Box>
           )}
           {totalResult.totalResults>0 && (
+            <>
             <CategoryBox category="Politics" data={politicsNewsQuery} />
+            <ReactPaginate
+					pageCount={pageCount}
+					pageRange={2}
+					marginPagesDisplayed={2}
+					onPageChange={handlePageChange}
+					containerClassName={'container'}
+					previousLinkClassName={'page'}
+					breakClassName={'page'}
+					nextLinkClassName={'page'}
+					pageClassName={'page'}
+					disabledClassNae={'disabled'}
+          activeClassName={'active'}
+          forcePage={currentPage -1} 
+				/>
+         </>
           )}
           
         </Box>
