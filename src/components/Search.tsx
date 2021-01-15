@@ -12,7 +12,14 @@ import { formatDate } from '../utils';
 import '../utils/home.css';
 import { useHistory } from "react-router";
 
-const NewsPage: React.FC<{}> = () => {
+interface CategorySearch {
+  location:{
+    state:{
+      results:string
+    }
+  };
+}
+const Search:React.FC<CategorySearch> = (props:CategorySearch) => {
   let history = useHistory();
   const [bannerNews, setBannerNews] = useState<IArticle | null>(null);
   // const politicsNewsQuery = useQuery(["politicsNews", 'politics'], API.fetchNewsWithCategory);
@@ -31,27 +38,11 @@ const NewsPage: React.FC<{}> = () => {
   const [resultsSearch, setResultsSearch] = useState([]);
   const [submitForm, setSubmitForm] = useState(0);
 
-  useEffect(() => {
-    const fetchDataTop = async () => {
-      const result = await API.fetchEverything();
-      setHeadlinesQuery(result.articles);
-    };
-    console.log('1');
-    fetchDataTop();
-  }, []);
-
-  useEffect(() => {
-    const fetchDataBanner= async () => {
-      const result = await API.fetchEverything();
-      setBannerNews(result.articles[0]);
-    }
-    console.log('2');
-    fetchDataBanner();
-  }, []);
  
   useEffect(() => {
     const fetchData = async () => {
-      const result = await API.fetchNewsWithCategory('','politics',currentPage,query);
+      const searchString:string=props.location.state.results;
+      const result = await API.fetchNewsWithSearch(currentPage,searchString);
       setPoliticsNewsQuery(result.articles);
       setTotalResult({totalResults:result.totalResults});
       const pageTotal=Math.ceil(result.totalResults/3);
@@ -106,28 +97,9 @@ const NewsPage: React.FC<{}> = () => {
         direction={{ base: "column", lg: "row" }}
       >
         <Box width={{ base: "100%", lg: "70%" }} px={5} pt={5}>
-        {(headlinesQuery.length===0)?<p>Loading...</p>:(
-            <Box>
-              <Stack spacing={2} align="flex-start">
-                <Stack spacing={5}>
-                  <Heading>{bannerNews?.title}</Heading>
-                  {bannerNews?.author && (
-                    <Text color="gray.500">by {bannerNews?.author}</Text>
-                  )}
-                  <Text fontSize="md">{bannerNews?.description}</Text>
-                </Stack>
-                <Image
-                  src={bannerNews?.urlToImage}
-                  alt={`Image of ${bannerNews?.title}`}
-                  width="100%"
-                  my={5}
-                />
-              </Stack>
-            </Box>
-          )}
           {totalResult.totalResults>0 && (
             <>
-            <CategoryBox category="Politics" data={politicsNewsQuery} />
+            <CategoryBox category="Result Search" data={politicsNewsQuery} />
             <ReactPaginate
 					pageCount={pageCount}
 					pageRange={2}
@@ -181,4 +153,4 @@ const NewsPage: React.FC<{}> = () => {
   );
 };
 
-export default NewsPage;
+export default Search;

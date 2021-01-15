@@ -44,3 +44,12 @@ export const fetchNewsWithCategory = async (_: string, category: string,page:num
   });
   return response;
 }
+
+export const fetchNewsWithSearch = async (page:number,search:string) => {
+  const response = await call({
+    url: `${BASE_API.url}/top-headlines?country=us&q=${search}&page=${page}&pageSize=3`,
+    headers: BASE_API.headers,
+    method: "GET",
+  });
+  return response;
+}
